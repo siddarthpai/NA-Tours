@@ -7,6 +7,16 @@ const tours = JSON.parse(fs.readFileSync(`${__dirname}/../dev-data/data/tours-si
 //here we dont have only one export unlike before,
 //so, we replace all with functions with exports
 
+exports.checkBody = (req, res, next) => {
+  if (!req.body.name || !req.body.price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Missing Name or price[incomplete body]'
+    })
+  }
+  next()
+}
+
 exports.getAllTours = (req, res) => {
   console.log(req.requestTime)
   res.status(200).json({
@@ -20,11 +30,6 @@ exports.getAllTours = (req, res) => {
 
 exports.getTour = (req, res) => {
   const id = req.params.id * 1
-  if (id > tours.length) {
-    return res.status(404).json({
-      status: 'not found'
-    })
-  }
   const tour = tours.find(el => el.id === id)
   res.status(200).json({
     status: 'success',
@@ -35,6 +40,7 @@ exports.getTour = (req, res) => {
 }
 
 exports.createTour = (req, res) => {
+  const id = req.params.id * 1
   const newId = tours[tours.length - 1].id + 1
   const newTour = Object.assign({ id: newId }, req.body)
 
@@ -55,11 +61,6 @@ exports.createTour = (req, res) => {
 
 exports.updateTour = (req, res) => {
   const id = req.params.id * 1
-  if (id > tours.length) {
-    return res.status(404).json({
-      status: 'not found'
-    })
-  }
   const tour = tours.find(el => el.id === id)
   res.status(200).json({
     status: 'Success',
@@ -71,15 +72,20 @@ exports.updateTour = (req, res) => {
 
 exports.deleteTour = (req, res) => {
   const id = req.params.id * 1
-  if (id > tours.length) {
-    return res.status(404).json({
-      status: 'Fail',
-      message: 'Tour to delete not found!'
-    })
-  }
   const tour = tours.find(el => el.id === id)
   res.status(204).json({
     status: 'Success',
     data: null
   })
+}
+
+exports.checkID = (req, res, next, val) => {
+  const id = req.params.id * 1
+  if (id > tours.length) {
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Invalid ID'
+    })
+  }
+  next()
 }
