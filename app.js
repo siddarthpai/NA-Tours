@@ -9,8 +9,8 @@ const app = express()
 //MIDDLEWARE
 
 app.use(morgan('dev')) //3rd party middleware!
-
 app.use(express.json()) //pre-defined middleware
+app.use(express.static(`${__dirname}/public`))
 
 app.use((req, res, next) => {
   //middleware we defined
